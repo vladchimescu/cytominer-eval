@@ -69,7 +69,9 @@ def enrichment(
         )
 
         v = np.asarray([[v11, v12], [v21, v22]])
-        r = scipy.stats.fisher_exact(v, alternative="greater")
+        # v has to be divided by 2, as the similarity df is symmetric
+        # and hence has duplicate TP, FP, FN, TN
+        r = scipy.stats.fisher_exact(v/2, alternative="greater")
         result.append(
             {
                 "enrichment_percentile": p,
