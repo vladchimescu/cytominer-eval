@@ -66,7 +66,7 @@ def precision_recall(
         precision_recall_df_at_k = similarity_melted_df.groupby(
             groupby_cols_suffix
         ).apply(lambda x: calculate_precision_recall(x, k=k_))
-        precision_recall_df = precision_recall_df.append(precision_recall_df_at_k)
+        precision_recall_df = pd.concat([precision_recall_df, precision_recall_df_at_k])
 
     # Rename the columns back to the replicate groups provided
     rename_cols = dict(zip(groupby_cols_suffix, groupby_columns))
