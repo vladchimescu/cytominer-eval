@@ -147,8 +147,13 @@ def evaluate(
             groupby_columns=groupby_columns,
             k=precision_recall_k,
         )
-        metric_result = dict(prec_rec=prec_rec_df,
-                             ap=ap_df)
+        prec_R, _ = precision_recall(
+            similarity_melted_df=similarity_melted_df,
+            replicate_groups=replicate_groups,
+            groupby_columns=groupby_columns,
+            k='R',
+        )
+        metric_result = (prec_rec_df, prec_R, ap_df)
     elif operation == "grit":
         metric_result = grit(
             similarity_melted_df=similarity_melted_df,
