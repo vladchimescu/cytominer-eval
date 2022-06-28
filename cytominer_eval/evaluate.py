@@ -141,12 +141,14 @@ def evaluate(
             return_median_correlations=replicate_reproducibility_return_median_cor,
         )
     elif operation == "precision_recall":
-        metric_result = precision_recall(
+        prec_rec_df, ap_df = precision_recall(
             similarity_melted_df=similarity_melted_df,
             replicate_groups=replicate_groups,
             groupby_columns=groupby_columns,
             k=precision_recall_k,
         )
+        metric_result = dict(prec_rec=prec_rec_df,
+                             ap=ap_df)
     elif operation == "grit":
         metric_result = grit(
             similarity_melted_df=similarity_melted_df,

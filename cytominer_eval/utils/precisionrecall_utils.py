@@ -1,4 +1,16 @@
 import pandas as pd
+import numpy as np
+from sklearn.metrics import average_precision_score
+
+def calculate_average_precision(replicate_group_df: pd.DataFrame):
+    # compute average precision using similarity as a prediction score
+    # AP is computed for each drug and the ground truth values are
+    # binary with True, if the drug is in the same class
+    yscore = replicate_group_df.similarity_metric.values
+    yscore[yscore < 0] = 0
+    ytrue = replicate_group_df.group_replicate.values
+    ap = average_precision_score(y_true=ytrue, y_score=yscore)
+    return pd.Series({'AP': ap})
 
 
 def calculate_precision_recall(replicate_group_df: pd.DataFrame, k) -> pd.Series:
@@ -36,8 +48,7 @@ def calculate_precision_recall(replicate_group_df: pd.DataFrame, k) -> pd.Series
         )
 
         precision_at_k = num_recommended_items_at_k / precision_denom__num_recommended_items
-        recall_at_k = num_recommended_items_at_k / recall_denom__total_relevant_items
-
+        recall_at_k = num_recommended_items_at_k / recall_denom__total_relevant_items     
         return_bundle = {"k": k, "precision": precision_at_k, "recall": recall_at_k}
 
         return pd.Series(return_bundle)

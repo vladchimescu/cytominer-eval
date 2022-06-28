@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from typing import List, Union
 
-from cytominer_eval.utils.precisionrecall_utils import calculate_precision_recall
+from cytominer_eval.utils.precisionrecall_utils import calculate_precision_recall, calculate_average_precision
 from cytominer_eval.utils.operation_utils import assign_replicates
 from cytominer_eval.utils.transform_utils import set_pair_ids, assert_melt
 
@@ -71,4 +71,11 @@ def precision_recall(
     # Rename the columns back to the replicate groups provided
     rename_cols = dict(zip(groupby_cols_suffix, groupby_columns))
 
-    return precision_recall_df.reset_index().rename(rename_cols, axis="columns")
+    prec_rec_df = precision_recall_df.reset_index().rename(rename_cols, axis="columns")
+
+    ap_df = similarity_melted_df.groupby(
+            groupby_cols_suffix
+        ).apply(lambda x: calculate_average_precision(x)).reset_index()
+    ap_df = ap_df.rename(rename_cols, axis="columns")
+
+    return prec_rec_df, ap_df
