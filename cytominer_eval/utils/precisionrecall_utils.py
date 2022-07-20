@@ -36,7 +36,7 @@ def calculate_precision_recall(replicate_group_df: pd.DataFrame, k) -> pd.Series
         "group_replicate" in replicate_group_df.columns
     ), "'group_replicate' not found in dataframe; remember to call assign_replicates()."
 
-    recall_denom__total_relevant_items = sum(replicate_group_df.group_replicate)
+    recall_denom__total_relevant_items = sum(replicate_group_df.group_replicate) - 1
 
     if k != "R":
         precision_denom__num_recommended_items = k
