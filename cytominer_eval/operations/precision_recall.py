@@ -70,12 +70,10 @@ def precision_recall(
 
     # Rename the columns back to the replicate groups provided
     rename_cols = dict(zip(groupby_cols_suffix, groupby_columns))
-
     prec_rec_df = precision_recall_df.reset_index().rename(rename_cols, axis="columns")
-
+    # calculate mean average precision (mAP) based on correlation values
     ap_df = similarity_melted_df.groupby(
             groupby_cols_suffix
         ).apply(lambda x: calculate_average_precision(x)).reset_index()
-    ap_df = ap_df.rename(rename_cols, axis="columns")
-
+    ap_df = ap_df.rename(rename_cols, axis="columns").drop(columns=['level_1'])
     return prec_rec_df, ap_df

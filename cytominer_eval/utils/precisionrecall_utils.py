@@ -1,16 +1,25 @@
 import pandas as pd
 import numpy as np
-from sklearn.metrics import average_precision_score
+from sklearn.metrics import average_precision_score, precision_recall_curve
+from sklearn.metrics import precision_score, recall_score
 
 def calculate_average_precision(replicate_group_df: pd.DataFrame):
     # compute average precision using similarity as a prediction score
     # AP is computed for each drug and the ground truth values are
     # binary with True, if the drug is in the same class
     yscore = replicate_group_df.similarity_metric.values
+    # TODO: not sure about setting negative values to 0 (?)
     yscore[yscore < 0] = 0
     ytrue = replicate_group_df.group_replicate.values
+    thresholds = np.linspace(0,1,30)
+    precision = [precision_score(ytrue, yscore > t, zero_division=0) for t in thresholds]
+    recall = [recall_score(ytrue, yscore > t, zero_division=0) for t in thresholds]
+    #precision, recall, thresholds = precision_recall_curve(ytrue, yscore)
+    pr_curve = pd.DataFrame(dict(precision=precision, recall=recall,
+                                 correlation=thresholds))
     ap = average_precision_score(y_true=ytrue, y_score=yscore)
-    return pd.Series({'AP': ap})
+    pr_curve['AP'] = ap
+    return pr_curve
 
 
 def calculate_precision_recall(replicate_group_df: pd.DataFrame, k) -> pd.Series:
@@ -36,7 +45,7 @@ def calculate_precision_recall(replicate_group_df: pd.DataFrame, k) -> pd.Series
         "group_replicate" in replicate_group_df.columns
     ), "'group_replicate' not found in dataframe; remember to call assign_replicates()."
 
-    recall_denom__total_relevant_items = sum(replicate_group_df.group_replicate) - 1
+    recall_denom__total_relevant_items = sum(replicate_group_df.group_replicate)
 
     if k != "R":
         precision_denom__num_recommended_items = k
