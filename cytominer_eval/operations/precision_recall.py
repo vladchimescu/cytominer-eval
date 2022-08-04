@@ -4,6 +4,7 @@ Functions to calculate precision and recall at a given k
 
 import numpy as np
 import pandas as pd
+from sklearn.metrics import average_precision_score
 from typing import List, Union
 
 from cytominer_eval.utils.precisionrecall_utils import calculate_precision_recall, calculate_average_precision
@@ -76,4 +77,16 @@ def precision_recall(
             groupby_cols_suffix
         ).apply(lambda x: calculate_average_precision(x)).reset_index()
     ap_df = ap_df.rename(rename_cols, axis="columns").drop(columns=['level_1'])
+    # compute micro average precision over correlation
+    # TODO do we need to do this only for unique pairs?
+    # yscore = similarity_melted_df.similarity_metric.values
+    # ytrue = similarity_melted_df.group_replicate.values
+    # micro_AP = average_precision_score(y_true=ytrue, y_score=yscore)
+    # ap_df['micro_AP'] = micro_AP
+    # # compute micro average precision over k
+    # similarity_melted_df['k_rank'] = (similarity_melted_df.groupby(groupby_cols_suffix)['similarity_metric'].
+    #                                 rank(method="first", ascending=True))
+    # yscore = -similarity_melted_df.k_rank.values
+    # micro_AP_over_k = average_precision_score(y_true=ytrue, y_score=yscore)
+    # ap_df['micro_AP_over_k'] = micro_AP_over_k
     return prec_rec_df, ap_df

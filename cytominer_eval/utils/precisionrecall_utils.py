@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from sklearn.metrics import average_precision_score, precision_recall_curve
+from sklearn.metrics import average_precision_score
 from sklearn.metrics import precision_score, recall_score
 
 def calculate_average_precision(replicate_group_df: pd.DataFrame):
@@ -8,7 +8,6 @@ def calculate_average_precision(replicate_group_df: pd.DataFrame):
     # AP is computed for each drug and the ground truth values are
     # binary with True, if the drug is in the same class
     yscore = replicate_group_df.similarity_metric.values
-    # TODO: not sure about setting negative values to 0 (?)
     yscore[yscore < 0] = 0
     ytrue = replicate_group_df.group_replicate.values
     thresholds = np.linspace(0,1,30)
@@ -19,8 +18,11 @@ def calculate_average_precision(replicate_group_df: pd.DataFrame):
                                  correlation=thresholds))
     ap = average_precision_score(y_true=ytrue, y_score=yscore)
     pr_curve['AP'] = ap
+    # calculate AP over k
+    yscore = -np.arange(len(ytrue))
+    ap_over_k = average_precision_score(y_true=ytrue, y_score=yscore)
+    pr_curve['AP_over_k'] = ap_over_k
     return pr_curve
-
 
 def calculate_precision_recall(replicate_group_df: pd.DataFrame, k) -> pd.Series:
     """Given an elongated pairwise correlation dataframe of replicate groups, calculate
